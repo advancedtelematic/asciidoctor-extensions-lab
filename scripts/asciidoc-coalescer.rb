@@ -20,6 +20,8 @@
 require 'asciidoctor'
 require 'optparse'
 
+require 'asciidoctor-github-include'
+
 options = { attributes: [], output: '-' }
 OptionParser.new do |opts|
   opts.banner = 'Usage: ruby asciidoc-coalescer.rb [OPTIONS] FILE'
@@ -53,7 +55,7 @@ header_attr_names.each {|k| doc.attributes[%(#{k}!)] = '' unless doc.attr? k }
 doc = Asciidoctor.load_file source_file, safe: :unsafe, parse: false, attributes: doc.attributes
 # FIXME also escape ifdef, ifndef, ifeval and endif directives
 # FIXME do this more carefully by reading line by line; if input differs by output by leading backslash, restore original line
-lines = doc.reader.read.gsub(/^include::(?=.*\[\]$)/m, '\\include::')
+lines = doc.reader.read.gsub(/^include::(?=.*\[\]$)/m, '\\include::').gsub(/\n\n+/, "\n\n")
 
 if output_file == '-'
   puts lines
